@@ -1,0 +1,224 @@
+---
+title: "Investigating COVID-19 Virus Trends"
+output: html_notebook
+---
+
+# Introduction
+
+The COVID-19 pandemic has significantly impacted global health systems and economies, leading to extensive data collection efforts to better understand the spread and effects of the virus. This project utilizes real-world data collected between January 20 and June 1, 2020, to analyze trends in COVID-19 cases and testing across different countries.
+
+The main objective of this project is to determine which countries have reported the highest number of positive cases in relation to the number of tests conducted. By using R and the dplyr package, we will clean, manipulate, and analyze the dataset to extract meaningful insights. This hands-on approach will enhance our data analysis skills while demonstrating the importance of data-driven decision-making in public health.
+
+# Understanding the Data
+
+1.  Download the `covid19.csv` CSV file.
+2.  Load this file using the function `read_csv()` from the `readr` package.
+
+```{r}
+# Load library
+library(readr)
+
+# Load CSV file
+covid_df <- read_csv("covid19.csv", show_col_types = FALSE)
+
+# View Data frame
+covid_df
+```
+
+3.  Determine the dimension of the dataframe, `covid_df` by using the function `dim()`.
+
+```{r}
+# Set Variable as Dimensions of Data frame
+dims <- dim(covid_df)
+
+# View Variable
+dims
+```
+
+4.  Determine the column names of `covid_df` using the `colnames()` function.
+
+```{r}
+# Set Variable as Names of Columns
+vector_cols <- colnames(covid_df)
+
+# View Variable
+vector_cols
+```
+
+5.  Display the first few rows of the `covid_df` dataset using the function `head()`.
+
+```{r}
+# View First 6 Rows of Data frame
+head(covid_df)
+```
+
+6.  Display the summary of the `covid_df` dataset using the function `glimpse()` from the `tibble` package.
+
+```{r}
+# Load library
+library(tibble)
+
+# Show Summary of Data frame
+glimpse <- glimpse(covid_df)
+```
+
+# Isolating the Rows We Need
+
+1.  Filter the rows related to `"All States"` from the `Province_State` column and remove the `Province_State` column from `covid_df` dataframe.
+
+```{r}
+# Load Library
+library(dplyr)
+
+# Filter Data frame to have only "All States", then Remove Column
+covid_df_all_states <- covid_df %>%
+  filter(Province_State == "All States") %>%
+  select(-Province_State)
+
+# View New Data frame
+head(covid_df_all_states)
+```
+
+# Isolating the Columns We Need
+
+1.  Select the following column, related to the daily measures, from the `covid_df_all_states`: `Date`, `Country_Region`, `active`, `hospitalizedCurr`, `daily_tested`, `daily_positive`.
+
+```{r}
+# Set Vector to have Desired Columns
+columns_to_save <- c("Date", "Country_Region", "active", "hospitalizedCurr", "daily_tested", "daily_positive")
+
+# Remove Cumulative Data, only Daily
+covid_df_all_states_daily <- covid_df_all_states %>%
+  select(all_of(columns_to_save))
+
+# View New Data frame
+head(covid_df_all_states_daily)
+```
+
+# Extracting the Top Ten Countries with Most Covid-19 Cases
+
+1.  Write code to summarize the `covid_df_all_states_daily` dataframe by computing the sum of the number of tested, positive, active and hospitalized cases grouped by the `Country_Region` column.
+
+```{r}
+# Group Data fram by Country and Sum each Column
+covid_df_all_states_daily_sum <- covid_df_all_states_daily %>%
+  group_by(Country_Region) %>%
+  summarise(tested = sum(daily_tested), positive = sum(daily_positive), active = sum(active), hospitalized = sum(hospitalizedCurr)) %>%
+  arrange(desc(tested))
+
+# View New Data frame
+covid_df_all_states_daily_sum
+```
+
+2.  Extract the top ten rows from the `covid_df_all_states_daily_sum` dataframe using the command `head(covid_df_all_states_daily_sum, 10)`.
+
+```{r}
+# Safe only Top 10 Countries from Data frame
+covid_top_10 <- head(covid_df_all_states_daily_sum, 10)
+
+# View New Data frame
+covid_top_10
+```
+
+# Identifying the Highest Positive Against Tested Cases
+
+1.  Create the vectors from the covid_top_10 dataframe.
+
+```{r}
+# Save each Column as Vector
+countries <- covid_top_10$Country_Region
+tested_cases <- covid_top_10$tested
+positive_cases <- covid_top_10$positive
+active_cases <- covid_top_10$active
+hospitalized_cases <- covid_top_10$hospitalized
+```
+
+2.  Write code to name the previous vectors: `tested_cases`, `positive_cases`, `active_cases`, and `hospitalized_cases` with the country names' vector `countries` using the function `names()`.
+
+```{r}
+names(tested_cases) <- countries
+names(positive_cases) <- countries
+names(active_cases) <- countries
+names(hospitalized_cases) <- countries
+```
+
+3.  Identify the top three positive against tested cases.
+
+```{r}
+# Identify Ratios  for each Country
+positive_cases / tested_cases
+
+# Store Top 3 Ratios
+positive_tested_top_3 <- c("United Kingdom" = 0.113260617, "United States" = 0.108618191, "Turkey" = 0.080711720)
+  
+# View Top 3 Ratios with Country
+positive_tested_top_3
+```
+
+# Keeping Relevant Information
+
+![](images/Screenshot%202025-03-26%20at%2022.19.08.png)
+
+1.  Create the following vectors from the table above.
+
+```{r}
+# Create Vectors
+united_kingdom <- c(0.11, 1473672, 166909, 0, 0)
+united_states <- c(0.10, 17282363, 1877179, 0, 0)
+turkey <- c(0.08, 2031192, 163941, 2980960, 0)
+```
+
+2.  Create a matrix combining the vectors: `united_kingdom`, `united_states`, and `turkey`.
+
+```{r}
+# Create Matrix
+covid_mat <- rbind(united_kingdom, united_states, turkey)
+
+# Rename
+colnames(covid_mat) <- c("Ratio", "tested", "positive", "active", "hospitalized")
+
+# View Matrix
+covid_mat
+```
+
+# Putting All Together
+
+1.  Create a character variable named `question` that contains our question.
+
+```{r}
+# Set Question
+question <- "Which countries have had the highest number of positive cases against the number of tests?"
+```
+
+2.  Create a named vector that contains our answer with the following command:
+
+```{r}
+# Set Answer
+answer <- c("Positive tested cases" = positive_tested_top_3)
+```
+
+3.  Create a list that contains the data structures mentioned above.
+
+```{r}
+# Store each Datastructures in List
+dataframes_list <- list(covid_df, covid_df_all_states, covid_df_all_states_daily, covid_top_10)
+matrices_list <- list(covid_mat)
+vectors_list <- list(vector_cols, countries)
+
+# Store Previous Lists with Names
+data_structure_list <- list(
+  dataframes = dataframes_list,
+  matrices = matrices_list,
+  vectors = vectors_list
+)
+```
+
+4.  Create a list that contains the following lists: `question`, `answer`, and `data_structure_list`.
+
+```{r}
+# Store Everything
+covid_analysis_list <- list(question, answer, data_structure_list)
+
+# View Second List
+covid_analysis_list[[2]]
+```
