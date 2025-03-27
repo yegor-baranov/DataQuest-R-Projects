@@ -5,9 +5,7 @@ output: html_notebook
 
 # Introduction
 
-The COVID-19 pandemic has significantly impacted global health systems and economies, leading to extensive data collection efforts to better understand the spread and effects of the virus. This project utilizes real-world data collected between January 20 and June 1, 2020, to analyze trends in COVID-19 cases and testing across different countries.
-
-The main objective of this project is to determine which countries have reported the highest number of positive cases in relation to the number of tests conducted. By using R and the dplyr package, we will clean, manipulate, and analyze the dataset to extract meaningful insights. This hands-on approach will enhance our data analysis skills while demonstrating the importance of data-driven decision-making in public health.
+In this beginner-level R project, you'll step into the role of a data analyst exploring the global COVID-19 pandemic using real-world data. Leveraging R and the powerful dplyr library, you'll manipulate, filter, and aggregate a comprehensive dataset containing information on COVID-19 cases, tests, and hospitalizations across different countries. By applying data wrangling techniques such as grouping and summarizing, you'll uncover which countries have the highest rates of positive COVID-19 tests relative to their testing numbers. This hands-on project will not only strengthen your R programming skills and analytical thinking but also provide valuable experience in deriving actionable insights from real-world health data – a crucial skill in today's data-driven healthcare landscape.
 
 # Understanding the Data
 
